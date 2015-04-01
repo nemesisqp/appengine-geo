@@ -43,7 +43,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	fmt.Fprint(w, string(respBytes))
+	w.Write(respBytes)
 }
