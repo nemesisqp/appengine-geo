@@ -3,7 +3,6 @@ package gokumanga_geo
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"encoding/json"
 )
 
@@ -18,20 +17,17 @@ func init() {
 	http.HandleFunc("/", handler)
 }
 
-func AddSafeHeaders(w *http.ResponseWriter) {
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.Header().Set("X-XSS-Protection", "1; mode=block")
-	w.Header().Set("X-Frame-Options", "SAMEORIGIN")
-	w.Header().Set("Strict-Transport-Security", "max-age=2592000; includeSubDomains")
-}
-
 func handler(w http.ResponseWriter, r *http.Request) {
 	var respBytes []byte
 	var err error
 
-	AddSafeHeaders(&w)
+	header := w.Header()
+	header.Set("X-Content-Type-Options", "nosniff")
+	header.Set("X-XSS-Protection", "1; mode=block")
+	header.Set("X-Frame-Options", "SAMEORIGIN")
+	header.Set("Strict-Transport-Security", "max-age=2592000; includeSubDomains")
 
-	var respObj = &Response{
+	var respObj = &VisitorGeo{
 		Country: r.Header.Get("X-AppEngine-Country"),
 		Region: r.Header.Get("X-AppEngine-Region"),
 		City: r.Header.Get("X-AppEngine-City"),
@@ -43,6 +39,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(respBytes)
+	fmt.Fprint(w, string(respBytes))
 }
